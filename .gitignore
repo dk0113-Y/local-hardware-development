@@ -1,0 +1,109 @@
+﻿# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.token
+secrets.*
+credentials.*
+config.local.*
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Build outputs
+build/
+dist/
+out/
+target/
+.cache/
+tmp/
+temp/
+
+# PlatformIO / embedded
+.pio/
+.pioenvs/
+.piolibdeps/
+libdeps/
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/ipch/
+
+# Arduino
+*.hex
+*.elf
+*.bin
+*.map
+*.lst
+
+# KiCad backups / caches
+*-backups/
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.sch-bak
+fp-info-cache
+
+# Large/generated archives
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# CMake / Ninja generated build directories
+build-native/
+build/
+out/
+cmake-build-*/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+CMakeConfigureLog.yaml
+CTestTestfile.cmake
+cmake_install.cmake
+
+# Ninja generated files
+.ninja_*
+*.ninja
+
+# Compiled binaries / objects
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.pdb
