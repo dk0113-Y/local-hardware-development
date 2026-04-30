@@ -30,6 +30,7 @@ assignees: ""
 - tests/
 - benchmarks/
 - docs/
+
 Or write: Let Codex search the repository first.
 -->
 
@@ -41,28 +42,26 @@ Or write: Let Codex search the repository first.
 
 ## Testing requirements
 
-Codex should run the relevant commands before finishing.
+Codex should run the relevant commands before finishing:
 
-Suggested baseline commands:
+- `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `.\build\bench_matmul.exe`
 
-```powershell
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-ctest --test-dir build --output-on-failure
-.\build\bench_matmul.exe
 If these commands cannot be run, Codex must explain why.
 
-Codex instruction
+## Codex instruction
 
 @codex please implement this issue with minimal, focused changes.
 
-Follow AGENTS.md.
+Follow `AGENTS.md`.
 
 Requirements:
 
-Do not push directly to main.
-Work on a separate branch.
-Open a pull request when finished.
-Do not commit generated build outputs or binaries.
-Keep the PR focused on this issue.
-Include a Chinese summary of changed files, commands run, test results, and remaining risks.
+- Do not push directly to `main`.
+- Work on a separate branch.
+- Open a pull request when finished.
+- Do not commit generated build outputs or binaries.
+- Keep the PR focused on this issue.
+- Include a Chinese summary of changed files, commands run, test results, and remaining risks.
