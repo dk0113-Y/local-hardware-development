@@ -7,12 +7,20 @@ description: Use this repository-level skill when a local-hardware-development t
 
 Use this skill to make small, reviewable changes after the task is clear.
 
-## Before Editing
+## Default Direct-main Flow
 
-1. Read and follow `AGENTS.md`.
-2. If the task comes from a GitHub Issue, read the Issue content first.
-3. Work on a separate branch or worktree. Do not push directly to `main`.
-4. Keep changes focused on the task.
+1. Confirm the current branch is `main`.
+2. Read and follow `AGENTS.md`.
+3. Understand the task. If the task comes from a GitHub Issue, read the Issue content first.
+4. Modify files with focused changes.
+5. Run necessary checks or tests.
+6. Run `git status` and inspect the modification scope.
+7. Run `git add` only for relevant files.
+8. Run `git commit`.
+9. Run `git push origin main`.
+10. Summarize changed files, test results, push status, and risks in Chinese.
+
+Only create a temporary branch, worktree, or PR if the user explicitly asks.
 
 ## Edit Rules
 
@@ -20,6 +28,9 @@ Use this skill to make small, reviewable changes after the task is clear.
 - Do not commit generated build outputs, binaries, caches, temporary files, or local machine-specific files.
 - Do not modify files under `build/`, `build-native/`, `out/`, or `cmake-build-*`.
 - Do not include `.exe`, `.obj`, `.a`, or similar build artifacts.
+- Do not commit secrets, credentials, tokens, private keys, or privacy-sensitive information.
+- Before committing or pushing, inspect `git status` and the staged file list.
+- If the working tree contains suspicious files, stop and ask the user before committing.
 - Preserve beginner-friendly structure and explanations.
 
 ## Verification
@@ -49,5 +60,7 @@ Output in Chinese and include:
 - 运行了哪些命令。
 - 测试结果。
 - benchmark 结果，如果相关。
+- commit hash。
+- push 到 `origin/main` 的状态。
 - 剩余风险。
-- 是否建议创建 PR。
+- 是否需要后续修复提交。

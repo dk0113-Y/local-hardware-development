@@ -15,10 +15,12 @@ Use this skill to decide whether a task is clear, small, safe, and ready for imp
    - `README.md`
    - `docs/phase1.md`
    - `CMakeLists.txt`
-4. Decide whether the task is small enough for one focused PR.
-5. If the task is too large, recommend a split.
-6. If the task is unclear, ask concise clarifying questions before editing files.
-7. Do not modify files unless the user explicitly switches to implementation.
+4. Note that the default delivery mode is direct-main: Codex should work on `main`, commit to `main`, and push to `origin/main` unless the user explicitly asks for a branch, worktree, or PR.
+5. Decide whether the task is small enough for one focused direct-main commit.
+6. If the task is too large, recommend a split.
+7. If the task is high risk, broad in scope, or likely to break the main line, recommend a temporary branch or PR, but do not create one unless the user agrees.
+8. If the task is unclear, ask concise clarifying questions before editing files.
+9. Do not modify files unless the user explicitly switches to implementation.
 
 ## Intake Report
 
@@ -30,6 +32,7 @@ Output in Chinese and include:
 - 预计涉及文件。
 - 风险点。
 - 测试计划。
+- direct-main 是否合适；如果不合适，说明为什么建议临时分支或 PR。
 - 是否建议进入实现阶段。
 
 Keep the report concrete enough that it can become a GitHub Issue or Codex implementation instruction.

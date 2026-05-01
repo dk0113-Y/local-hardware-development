@@ -59,9 +59,12 @@ Follow `AGENTS.md`.
 
 Requirements:
 
-- Do not push directly to `main`.
-- Work on a separate branch.
-- Open a pull request when finished.
-- Do not commit generated build outputs or binaries.
-- Keep the PR focused on this issue.
-- Include a Chinese summary of changed files, commands run, test results, and remaining risks.
+- This is a personal learning repository using direct-main delivery by default.
+- Work on `main` by default.
+- Commit completed changes directly on `main`.
+- Push completed changes to `origin/main` by default.
+- Do not create a temporary branch or pull request unless the user explicitly asks.
+- Before committing or pushing, run `git status` and inspect the staged file list.
+- Do not commit generated build outputs, binaries, caches, temporary files, local machine-specific files, secrets, credentials, tokens, or private information.
+- If the working tree contains suspicious files, stop and ask the user before committing.
+- Include a Chinese summary of changed files, commands run, test results, push status, and remaining risks.

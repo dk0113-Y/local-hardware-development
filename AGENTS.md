@@ -26,10 +26,15 @@ When summarizing work for the user:
 
 ## Safety rules
 
-- Do not push directly to `main`.
-- Work on a new branch for each task.
-- Open a pull request when finished.
-- Keep each pull request focused on one issue.
+- This is a personal learning repository.
+- The default delivery mode is direct-main.
+- Work on `main` by default.
+- Commit completed changes directly on `main`.
+- Push completed changes to `origin/main` by default.
+- Do not create temporary task branches unless the user explicitly asks.
+- Do not create pull requests unless the user explicitly asks.
+- Before committing or pushing, run `git status` and inspect the staged file list.
+- If the working tree contains suspicious files, stop and ask the user before committing.
 - Do not rewrite Git history unless the user explicitly asks.
 - Do not delete files unless the issue explicitly asks for deletion.
 - Do not modify secrets, credentials, tokens, private keys, or local machine-specific configuration.
@@ -77,9 +82,9 @@ Before finishing a task:
 - If tests or benchmarks cannot be run, explain why.
 - Do not claim that tests passed unless they were actually run.
 
-## Pull request expectations
+## Direct-main delivery expectations
 
-Every PR should include:
+Every completed change should include:
 
 1. What changed.
 2. Why it changed.
@@ -87,19 +92,24 @@ Every PR should include:
 4. Commands run.
 5. Test results.
 6. Known risks or follow-up work.
+7. Commit hash and push status.
+
+Only create a pull request if the user explicitly asks for one.
 
 Use Chinese for the user-facing summary.
 
 ## Review guidelines
 
-When reviewing a PR, check:
+When reviewing a commit, diff, or PR, check:
 
 - Does the change solve the issue?
 - Is the change unnecessarily large?
 - Does it modify unrelated files?
 - Are tests updated or added when behavior changes?
 - Are generated files or build outputs accidentally committed?
+- Were binaries, caches, secrets, credentials, tokens, or local machine-specific files accidentally committed?
 - Are benchmark results meaningful and reproducible?
 - Does the change keep the project beginner-friendly and easy to continue?
+- Should a bad `main` commit be reverted or followed by a fix commit?
 
 Treat accidental commits of build outputs, binaries, secrets, or unrelated large files as serious review issues.
