@@ -52,13 +52,20 @@ int test_known_values() {
 
   std::vector<float> c_ijk(m * n);
   std::vector<float> c_ikj(m * n);
+  std::vector<float> c_blocked(m * n);
   aihw::matmul_ijk(a.data(), b.data(), c_ijk.data(), m, n, k);
   aihw::matmul_ikj(a.data(), b.data(), c_ikj.data(), m, n, k);
+  aihw::matmul_blocked_ikj(
+      a.data(), b.data(), c_blocked.data(), m, n, k);
 
   if (expect_vector_near("matmul_ijk known-values", c_ijk, expected, 1e-5f)) {
     return 1;
   }
   if (expect_vector_near("matmul_ikj known-values", c_ikj, expected, 1e-5f)) {
+    return 1;
+  }
+  if (expect_vector_near(
+          "matmul_blocked_ikj known-values", c_blocked, expected, 1e-5f)) {
     return 1;
   }
   return 0;
@@ -73,15 +80,27 @@ int test_random_shapes() {
         const auto a = aihw::make_random_matrix(m, k, 1000 + m);
         const auto b = aihw::make_random_matrix(k, n, 2000 + n);
         std::vector<float> c_ref(m * n);
-        std::vector<float> c_opt(m * n);
+        std::vector<float> c_ikj(m * n);
+        std::vector<float> c_blocked(m * n);
 
         aihw::matmul_ijk(a.data(), b.data(), c_ref.data(), m, n, k);
-        aihw::matmul_ikj(a.data(), b.data(), c_opt.data(), m, n, k);
+        aihw::matmul_ikj(a.data(), b.data(), c_ikj.data(), m, n, k);
+        aihw::matmul_blocked_ikj(
+            a.data(), b.data(), c_blocked.data(), m, n, k);
 
-        const double max_diff = aihw::max_abs_diff(c_ref, c_opt);
-        if (max_diff > 1e-4) {
-          std::cerr << "random shape mismatch for m=" << m << ", n=" << n
-                    << ", k=" << k << ", max_diff=" << max_diff << "\n";
+        const double ikj_max_diff = aihw::max_abs_diff(c_ref, c_ikj);
+        if (ikj_max_diff > 1e-4) {
+          std::cerr << "matmul_ikj random shape mismatch for m=" << m
+                    << ", n=" << n << ", k=" << k
+                    << ", max_diff=" << ikj_max_diff << "\n";
+          return 1;
+        }
+
+        const double blocked_max_diff = aihw::max_abs_diff(c_ref, c_blocked);
+        if (blocked_max_diff > 1e-4) {
+          std::cerr << "matmul_blocked_ikj random shape mismatch for m=" << m
+                    << ", n=" << n << ", k=" << k
+                    << ", max_diff=" << blocked_max_diff << "\n";
           return 1;
         }
       }

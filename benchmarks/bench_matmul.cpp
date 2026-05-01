@@ -94,6 +94,8 @@ int main(int argc, char** argv) {
                  iterations),
       run_kernel("ikj_cache_order", aihw::matmul_ikj, a, b, reference, m, n, k,
                  iterations),
+      run_kernel("blocked_ikj_bs64", aihw::matmul_blocked_ikj, a, b, reference,
+                 m, n, k, iterations),
   };
 
   std::cout << "matrix_shape,m=" << m << ",n=" << n << ",k=" << k

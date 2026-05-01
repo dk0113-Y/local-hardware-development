@@ -84,3 +84,26 @@ Native Release build with `AIHW_ENABLE_NATIVE=ON`:
 | 256x256x256 | ikj_cache_order | 1.388 | 24.180 | 7.63e-06 |
 | 512x512x512 | ijk_baseline | 110.915 | 2.420 | 0 |
 | 512x512x512 | ikj_cache_order | 6.614 | 40.588 | 1.05e-05 |
+
+## Blocked IKJ Baseline Results
+
+Date: 2026-05-01. These are local Release measurements for the first
+`matmul_blocked_ikj` baseline using a fixed block size of 64. They are still
+single-run style benchmark results and should be rechecked before drawing broad
+conclusions.
+
+| Shape | Kernel | Best ms | GFLOP/s | Max diff |
+| --- | --- | ---: | ---: | ---: |
+| 256x256x256 | ijk_baseline | 14.364 | 2.336 | 0 |
+| 256x256x256 | ikj_cache_order | 1.651 | 20.326 | 0 |
+| 256x256x256 | blocked_ikj_bs64 | 1.531 | 21.914 | 0 |
+| 512x512x512 | ijk_baseline | 103.416 | 2.596 | 0 |
+| 512x512x512 | ikj_cache_order | 12.061 | 22.257 | 0 |
+| 512x512x512 | blocked_ikj_bs64 | 12.772 | 21.017 | 0 |
+| 1024x1024x1024 | ijk_baseline | 3364.977 | 0.638 | 0 |
+| 1024x1024x1024 | ikj_cache_order | 104.364 | 20.577 | 0 |
+| 1024x1024x1024 | blocked_ikj_bs64 | 107.835 | 19.915 | 0 |
+
+In this run, blocking improves the 256 case slightly but is slower than plain
+`ikj_cache_order` for 512 and 1024. The likely next step is testing multiple
+block sizes such as 16, 32, 64, and 128 before changing the default approach.
