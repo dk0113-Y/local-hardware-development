@@ -33,4 +33,6 @@ Include:
 - 当前适合推进的下一步。
 - 需要用户确认的问题。
 
-If any document mentions an old path, old project name, or outdated information, point it out clearly, but do not fix it unless the user explicitly asks.
+If any document mentions an old path, old project name, or outdated information, point it out clearly.
+
+Do not fix outdated information unless the user explicitly asks.

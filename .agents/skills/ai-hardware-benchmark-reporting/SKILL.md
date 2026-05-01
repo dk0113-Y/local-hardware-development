@@ -43,4 +43,6 @@ Mention factors that may affect results:
 
 ## Output
 
-Output in Chinese. Include a concise summary, a cautious conclusion, and recommended next experiments such as larger matrix sizes, repeated runs, native build comparison, tiled matmul, SIMD, multithreading, or GPU/NPU comparison when appropriate.
+Output in Chinese.
+
+Include a concise summary, a cautious conclusion, and recommended next experiments such as larger matrix sizes, repeated runs, native build comparison, tiled matmul, SIMD, multithreading, or GPU/NPU comparison when appropriate.

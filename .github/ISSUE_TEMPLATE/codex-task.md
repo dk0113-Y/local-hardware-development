@@ -36,9 +36,9 @@ Or write: Let Codex search the repository first.
 
 ## Acceptance criteria
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
+- [ ]
 
 ## Testing requirements
 

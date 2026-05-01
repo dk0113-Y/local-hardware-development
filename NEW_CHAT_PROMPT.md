@@ -1,5 +1,7 @@
 # New Chat Prompt
 
+当前仓库是 `local-hardware-development`。
+
 我想在 `C:\Users\27319\Desktop\computer\local-hardware-development` 这个仓库中继续推进一个长期的本地硬件感知 AI / 系统开发实验项目。请先读取当前目录、`README.md`、`AGENTS.md`、`docs/phase1.md` 和 `CMakeLists.txt`，然后根据仓库现状和我的电脑硬件条件制定小步推进计划。
 
 我的电脑硬件背景如下：
@@ -37,6 +39,8 @@
 - 如果需要安装依赖，先说明用途和影响。
 - 优先做可验证的小实验，每完成一步运行测试或 benchmark。
 - 不要执行破坏性命令，不要重置或删除无关文件。
-- 按 `AGENTS.md` 工作：不要直接 push 到 `main`，每个任务使用独立分支，完成后建议通过 GitHub Issue / Pull Request 中转。
+- 按 `AGENTS.md` 工作。
+- 默认使用 direct-main 工作流：在 `main` 上修改、commit，并 push 到 `origin/main`。
+- 默认不创建临时分支或 PR；只有我明确要求时才使用分支、Worktree 或 PR。
 
 请从检查目录、确认当前阶段和提出下一步计划开始。

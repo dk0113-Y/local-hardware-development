@@ -5,7 +5,9 @@ description: Use this repository-level skill when Codex receives a ChatGPT or GP
 
 # AI Hardware Task Intake
 
-Use this skill to decide whether a task is clear, small, safe, and ready for implementation. The default behavior is analysis only.
+Use this skill to decide whether a task is clear, small, safe, and ready for implementation.
+
+The default behavior is analysis only.
 
 ## Workflow
 
@@ -15,12 +17,13 @@ Use this skill to decide whether a task is clear, small, safe, and ready for imp
    - `README.md`
    - `docs/phase1.md`
    - `CMakeLists.txt`
-4. Note that the default delivery mode is direct-main: Codex should work on `main`, commit to `main`, and push to `origin/main` unless the user explicitly asks for a branch, worktree, or PR.
-5. Decide whether the task is small enough for one focused direct-main commit.
-6. If the task is too large, recommend a split.
-7. If the task is high risk, broad in scope, or likely to break the main line, recommend a temporary branch or PR, but do not create one unless the user agrees.
-8. If the task is unclear, ask concise clarifying questions before editing files.
-9. Do not modify files unless the user explicitly switches to implementation.
+4. Note that the default delivery mode is direct-main.
+5. Confirm that Codex should work on `main`, commit to `main`, and push to `origin/main` unless the user explicitly asks for a branch, worktree, or pull request.
+6. Decide whether the task is small enough for one focused direct-main commit.
+7. If the task is too large, recommend a split.
+8. If the task is high risk, broad in scope, or likely to break the main line, recommend a temporary branch or pull request, but do not create one unless the user agrees.
+9. If the task is unclear, ask concise clarifying questions before editing files.
+10. Do not modify files unless the user explicitly switches to implementation.
 
 ## Intake Report
 

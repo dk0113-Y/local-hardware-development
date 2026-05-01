@@ -24,17 +24,23 @@ When summarizing work for the user:
 - Prefer step-by-step explanations.
 - Be explicit about commands that were run or should be run.
 
-## Safety rules
+## Direct-main delivery policy
 
 - This is a personal learning repository.
 - The default delivery mode is direct-main.
-- Work on `main` by default.
-- Commit completed changes directly on `main`.
-- Push completed changes to `origin/main` by default.
-- Do not create temporary task branches unless the user explicitly asks.
-- Do not create pull requests unless the user explicitly asks.
+- Codex should work on `main` by default.
+- Codex should commit completed changes directly on `main`.
+- Codex should push completed changes to `origin/main` by default.
+- Codex should not create temporary task branches unless the user explicitly asks.
+- Codex should not create pull requests unless the user explicitly asks.
+- Only use a branch, worktree, or pull request when the user explicitly requests it.
 - Before committing or pushing, run `git status` and inspect the staged file list.
 - If the working tree contains suspicious files, stop and ask the user before committing.
+- If tests are relevant, run the appropriate tests before committing.
+- Do not claim tests passed unless they were actually run.
+
+## Safety rules
+
 - Do not rewrite Git history unless the user explicitly asks.
 - Do not delete files unless the issue explicitly asks for deletion.
 - Do not modify secrets, credentials, tokens, private keys, or local machine-specific configuration.
@@ -69,9 +75,9 @@ If the local environment uses a different build directory, such as `build-native
 
 If a required tool is missing, do not silently skip the step. Report:
 
-- which command failed;
-- the exact error;
-- what the user should install or configure next.
+- Which command failed.
+- The exact error.
+- What the user should install or configure next.
 
 ## Testing expectations
 
@@ -82,7 +88,7 @@ Before finishing a task:
 - If tests or benchmarks cannot be run, explain why.
 - Do not claim that tests passed unless they were actually run.
 
-## Direct-main delivery expectations
+## Direct-main summary expectations
 
 Every completed change should include:
 
@@ -100,7 +106,7 @@ Use Chinese for the user-facing summary.
 
 ## Review guidelines
 
-When reviewing a commit, diff, or PR, check:
+When reviewing a commit, diff, or pull request, check:
 
 - Does the change solve the issue?
 - Is the change unnecessarily large?

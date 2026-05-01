@@ -20,7 +20,7 @@ Use this skill to make small, reviewable changes after the task is clear.
 9. Run `git push origin main`.
 10. Summarize changed files, test results, push status, and risks in Chinese.
 
-Only create a temporary branch, worktree, or PR if the user explicitly asks.
+Only create a temporary branch, worktree, or pull request if the user explicitly asks.
 
 ## Edit Rules
 
@@ -49,7 +49,9 @@ For performance-related changes, also run:
 .\build\bench_matmul.exe
 ```
 
-If a command cannot run, report the exact command, the exact error, and what the user should install or configure next. Do not claim tests passed unless they actually ran.
+If a command cannot run, report the exact command, the exact error, and what the user should install or configure next.
+
+Do not claim tests passed unless they actually ran.
 
 ## Final Summary
 
