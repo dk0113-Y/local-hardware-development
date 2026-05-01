@@ -40,5 +40,9 @@ add_executable(bench_matmul
 )
 target_link_libraries(bench_matmul PRIVATE aihw_cpu)
 
+add_executable(bench_memory_access
+  benchmarks/bench_memory_access.cpp
+)
+
 enable_testing()
 add_test(NAME matmul_correctness COMMAND test_matmul)

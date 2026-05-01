@@ -33,6 +33,8 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ctest --test-dir build --output-on-failure
 .\build\bench_matmul.exe
+.\build\bench_memory_access.exe
 ```
 
 See `docs/phase1.md` for the experiment rationale and next steps.
+See `docs/cpu-memory-access.md` for the CPU cache and memory access benchmark.
