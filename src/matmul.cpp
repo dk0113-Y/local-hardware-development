@@ -46,22 +46,25 @@ void matmul_ikj(const float* a,
   }
 }
 
-void matmul_blocked_ikj(const float* a,
-                        const float* b,
-                        float* c,
-                        std::size_t m,
-                        std::size_t n,
-                        std::size_t k) {
+void matmul_blocked_ikj_with_block_size(const float* a,
+                                        const float* b,
+                                        float* c,
+                                        std::size_t m,
+                                        std::size_t n,
+                                        std::size_t k,
+                                        std::size_t block_size) {
+  if (block_size == 0) {
+    block_size = 64;
+  }
+
   std::fill(c, c + m * n, 0.0f);
 
-  constexpr std::size_t block = 64;
-
-  for (std::size_t ii = 0; ii < m; ii += block) {
-    for (std::size_t kk = 0; kk < k; kk += block) {
-      for (std::size_t jj = 0; jj < n; jj += block) {
-        const std::size_t i_end = std::min(ii + block, m);
-        const std::size_t k_end = std::min(kk + block, k);
-        const std::size_t j_end = std::min(jj + block, n);
+  for (std::size_t ii = 0; ii < m; ii += block_size) {
+    for (std::size_t kk = 0; kk < k; kk += block_size) {
+      for (std::size_t jj = 0; jj < n; jj += block_size) {
+        const std::size_t i_end = std::min(ii + block_size, m);
+        const std::size_t k_end = std::min(kk + block_size, k);
+        const std::size_t j_end = std::min(jj + block_size, n);
 
         for (std::size_t i = ii; i < i_end; ++i) {
           float* c_row = c + i * n;
@@ -76,6 +79,15 @@ void matmul_blocked_ikj(const float* a,
       }
     }
   }
+}
+
+void matmul_blocked_ikj(const float* a,
+                        const float* b,
+                        float* c,
+                        std::size_t m,
+                        std::size_t n,
+                        std::size_t k) {
+  matmul_blocked_ikj_with_block_size(a, b, c, m, n, k, 64);
 }
 
 std::vector<float> make_random_matrix(std::size_t rows,

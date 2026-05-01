@@ -94,8 +94,32 @@ int main(int argc, char** argv) {
                  iterations),
       run_kernel("ikj_cache_order", aihw::matmul_ikj, a, b, reference, m, n, k,
                  iterations),
+      run_kernel("blocked_ikj_bs16",
+                 [](const float* a_data, const float* b_data, float* c_data,
+                    std::size_t m_size, std::size_t n_size,
+                    std::size_t k_size) {
+                   aihw::matmul_blocked_ikj_with_block_size(
+                       a_data, b_data, c_data, m_size, n_size, k_size, 16);
+                 },
+                 a, b, reference, m, n, k, iterations),
+      run_kernel("blocked_ikj_bs32",
+                 [](const float* a_data, const float* b_data, float* c_data,
+                    std::size_t m_size, std::size_t n_size,
+                    std::size_t k_size) {
+                   aihw::matmul_blocked_ikj_with_block_size(
+                       a_data, b_data, c_data, m_size, n_size, k_size, 32);
+                 },
+                 a, b, reference, m, n, k, iterations),
       run_kernel("blocked_ikj_bs64", aihw::matmul_blocked_ikj, a, b, reference,
                  m, n, k, iterations),
+      run_kernel("blocked_ikj_bs128",
+                 [](const float* a_data, const float* b_data, float* c_data,
+                    std::size_t m_size, std::size_t n_size,
+                    std::size_t k_size) {
+                   aihw::matmul_blocked_ikj_with_block_size(
+                       a_data, b_data, c_data, m_size, n_size, k_size, 128);
+                 },
+                 a, b, reference, m, n, k, iterations),
   };
 
   std::cout << "matrix_shape,m=" << m << ",n=" << n << ",k=" << k

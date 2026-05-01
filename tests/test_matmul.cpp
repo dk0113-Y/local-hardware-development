@@ -53,10 +53,13 @@ int test_known_values() {
   std::vector<float> c_ijk(m * n);
   std::vector<float> c_ikj(m * n);
   std::vector<float> c_blocked(m * n);
+  std::vector<float> c_blocked_bs2(m * n);
   aihw::matmul_ijk(a.data(), b.data(), c_ijk.data(), m, n, k);
   aihw::matmul_ikj(a.data(), b.data(), c_ikj.data(), m, n, k);
   aihw::matmul_blocked_ikj(
       a.data(), b.data(), c_blocked.data(), m, n, k);
+  aihw::matmul_blocked_ikj_with_block_size(
+      a.data(), b.data(), c_blocked_bs2.data(), m, n, k, 2);
 
   if (expect_vector_near("matmul_ijk known-values", c_ijk, expected, 1e-5f)) {
     return 1;
@@ -68,11 +71,16 @@ int test_known_values() {
           "matmul_blocked_ikj known-values", c_blocked, expected, 1e-5f)) {
     return 1;
   }
+  if (expect_vector_near("matmul_blocked_ikj_with_block_size known-values",
+                         c_blocked_bs2, expected, 1e-5f)) {
+    return 1;
+  }
   return 0;
 }
 
 int test_random_shapes() {
   const std::vector<std::size_t> sizes = {1, 2, 3, 7, 16, 31};
+  const std::vector<std::size_t> block_sizes = {1, 2, 3, 4, 8, 16, 32, 64, 128};
 
   for (std::size_t m : sizes) {
     for (std::size_t n : sizes) {
@@ -81,12 +89,9 @@ int test_random_shapes() {
         const auto b = aihw::make_random_matrix(k, n, 2000 + n);
         std::vector<float> c_ref(m * n);
         std::vector<float> c_ikj(m * n);
-        std::vector<float> c_blocked(m * n);
 
         aihw::matmul_ijk(a.data(), b.data(), c_ref.data(), m, n, k);
         aihw::matmul_ikj(a.data(), b.data(), c_ikj.data(), m, n, k);
-        aihw::matmul_blocked_ikj(
-            a.data(), b.data(), c_blocked.data(), m, n, k);
 
         const double ikj_max_diff = aihw::max_abs_diff(c_ref, c_ikj);
         if (ikj_max_diff > 1e-4) {
@@ -96,12 +101,20 @@ int test_random_shapes() {
           return 1;
         }
 
-        const double blocked_max_diff = aihw::max_abs_diff(c_ref, c_blocked);
-        if (blocked_max_diff > 1e-4) {
-          std::cerr << "matmul_blocked_ikj random shape mismatch for m=" << m
-                    << ", n=" << n << ", k=" << k
-                    << ", max_diff=" << blocked_max_diff << "\n";
-          return 1;
+        for (std::size_t block_size : block_sizes) {
+          std::vector<float> c_blocked(m * n);
+          aihw::matmul_blocked_ikj_with_block_size(
+              a.data(), b.data(), c_blocked.data(), m, n, k, block_size);
+
+          const double blocked_max_diff =
+              aihw::max_abs_diff(c_ref, c_blocked);
+          if (blocked_max_diff > 1e-4) {
+            std::cerr << "matmul_blocked_ikj block_size=" << block_size
+                      << " random shape mismatch for m=" << m << ", n=" << n
+                      << ", k=" << k << ", max_diff=" << blocked_max_diff
+                      << "\n";
+            return 1;
+          }
         }
       }
     }

@@ -107,3 +107,42 @@ conclusions.
 In this run, blocking improves the 256 case slightly but is slower than plain
 `ikj_cache_order` for 512 and 1024. The likely next step is testing multiple
 block sizes such as 16, 32, 64, and 128 before changing the default approach.
+
+## Block Size Sweep Results
+
+Date: 2026-05-01. These are local Release measurements comparing blocked IKJ
+block sizes 16, 32, 64, and 128. The 2048 case was also run, but it is much
+slower because the benchmark still includes `ijk_baseline`.
+
+| Shape | Kernel | Best ms | GFLOP/s | Max diff |
+| --- | --- | ---: | ---: | ---: |
+| 256x256x256 | ijk_baseline | 14.709 | 2.281 | 0 |
+| 256x256x256 | ikj_cache_order | 1.426 | 23.524 | 0 |
+| 256x256x256 | blocked_ikj_bs16 | 2.660 | 12.612 | 0 |
+| 256x256x256 | blocked_ikj_bs32 | 1.720 | 19.506 | 0 |
+| 256x256x256 | blocked_ikj_bs64 | 1.501 | 22.353 | 0 |
+| 256x256x256 | blocked_ikj_bs128 | 1.464 | 22.926 | 0 |
+| 512x512x512 | ijk_baseline | 104.311 | 2.573 | 0 |
+| 512x512x512 | ikj_cache_order | 12.728 | 21.090 | 0 |
+| 512x512x512 | blocked_ikj_bs16 | 21.552 | 12.455 | 0 |
+| 512x512x512 | blocked_ikj_bs32 | 14.751 | 18.197 | 0 |
+| 512x512x512 | blocked_ikj_bs64 | 12.613 | 21.283 | 0 |
+| 512x512x512 | blocked_ikj_bs128 | 12.445 | 21.569 | 0 |
+| 1024x1024x1024 | ijk_baseline | 3147.854 | 0.682 | 0 |
+| 1024x1024x1024 | ikj_cache_order | 99.681 | 21.544 | 0 |
+| 1024x1024x1024 | blocked_ikj_bs16 | 180.151 | 11.920 | 0 |
+| 1024x1024x1024 | blocked_ikj_bs32 | 127.445 | 16.850 | 0 |
+| 1024x1024x1024 | blocked_ikj_bs64 | 111.077 | 19.333 | 0 |
+| 1024x1024x1024 | blocked_ikj_bs128 | 117.595 | 18.262 | 0 |
+| 2048x2048x2048 | ijk_baseline | 85647.928 | 0.201 | 0 |
+| 2048x2048x2048 | ikj_cache_order | 2383.211 | 7.209 | 0 |
+| 2048x2048x2048 | blocked_ikj_bs16 | 1479.401 | 11.613 | 0 |
+| 2048x2048x2048 | blocked_ikj_bs32 | 1034.150 | 16.613 | 0 |
+| 2048x2048x2048 | blocked_ikj_bs64 | 944.290 | 18.193 | 0 |
+| 2048x2048x2048 | blocked_ikj_bs128 | 903.277 | 19.019 | 0 |
+
+For 256 and 512, block size 128 is the best blocked variant and is close to
+plain `ikj_cache_order`. For 1024, plain `ikj_cache_order` wins. For 2048,
+blocking helps substantially and block size 128 is best in this run. The next
+benchmark improvement should be a way to skip `ijk_baseline` for large sizes so
+large blocked-kernel comparisons are less dominated by the slow reference run.

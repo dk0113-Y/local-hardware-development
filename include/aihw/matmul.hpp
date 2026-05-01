@@ -29,6 +29,14 @@ void matmul_blocked_ikj(const float* a,
                         std::size_t n,
                         std::size_t k);
 
+void matmul_blocked_ikj_with_block_size(const float* a,
+                                        const float* b,
+                                        float* c,
+                                        std::size_t m,
+                                        std::size_t n,
+                                        std::size_t k,
+                                        std::size_t block_size);
+
 std::vector<float> make_random_matrix(std::size_t rows,
                                       std::size_t cols,
                                       std::uint32_t seed);
