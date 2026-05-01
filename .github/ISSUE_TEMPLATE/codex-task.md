@@ -1,4 +1,4 @@
-﻿---
+---
 name: Codex Task
 about: Create a focused implementation task for Codex
 title: "[Codex Task] "
