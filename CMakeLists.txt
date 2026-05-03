@@ -30,15 +30,42 @@ else()
   endif()
 endif()
 
+add_library(aihw_runtime
+  src/tensor.cpp
+  src/ops.cpp
+)
+
+target_include_directories(aihw_runtime
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(aihw_runtime PUBLIC aihw_cpu)
+
 add_executable(test_matmul
   tests/test_matmul.cpp
 )
 target_link_libraries(test_matmul PRIVATE aihw_cpu)
 
+add_executable(test_tiny_runtime
+  tests/test_tiny_runtime.cpp
+)
+target_link_libraries(test_tiny_runtime PRIVATE aihw_runtime)
+
+add_executable(tiny_mlp
+  examples/tiny_mlp.cpp
+)
+target_link_libraries(tiny_mlp PRIVATE aihw_runtime)
+
 add_executable(bench_matmul
   benchmarks/bench_matmul.cpp
 )
 target_link_libraries(bench_matmul PRIVATE aihw_cpu)
+
+add_executable(bench_tiny_runtime
+  benchmarks/bench_tiny_runtime.cpp
+)
+target_link_libraries(bench_tiny_runtime PRIVATE aihw_runtime)
 
 add_executable(bench_memory_access
   benchmarks/bench_memory_access.cpp
@@ -50,3 +77,4 @@ add_executable(bench_cpu_affinity
 
 enable_testing()
 add_test(NAME matmul_correctness COMMAND test_matmul)
+add_test(NAME tiny_runtime_correctness COMMAND test_tiny_runtime)

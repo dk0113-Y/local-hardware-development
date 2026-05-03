@@ -22,16 +22,18 @@ Recommended development tracks:
 
 Use `NEW_CHAT_PROMPT.md` to start a new Codex chat with the intended context.
 
-## Current experiment
+## Current direction
 
-Phase 1 starts with a minimal C++ CPU matrix multiplication baseline. It is
-designed to run on Windows with the detected MinGW-w64 GCC, CMake, and Ninja
-toolchain.
+The current main line is a tiny AI runtime skeleton. The earlier matmul,
+memory access, and CPU affinity experiments remain as foundation experiments
+and support tools.
 
 ```powershell
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ctest --test-dir build --output-on-failure
+.\build\tiny_mlp.exe
+.\build\bench_tiny_runtime.exe
 .\build\bench_matmul.exe
 .\build\bench_memory_access.exe
 .\build\bench_cpu_affinity.exe --quick
@@ -41,3 +43,5 @@ ctest --test-dir build --output-on-failure
 See `docs/phase1.md` for the experiment rationale and next steps.
 See `docs/cpu-memory-access.md` for the CPU cache and memory access benchmark.
 See `docs/cpu-affinity.md` for the CPU affinity and logical processor benchmark.
+See `docs/tiny-runtime.md` for the tiny AI runtime direction.
+See `docs/runtime-cleanup-plan.md` for a cautious cleanup plan.
