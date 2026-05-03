@@ -34,6 +34,7 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 .\build\tiny_mlp.exe
 .\build\bench_tiny_runtime.exe
+.\build\bench_tiny_runtime.exe --pin-cpu 0
 .\build\bench_matmul.exe
 .\build\bench_memory_access.exe
 .\build\bench_cpu_affinity.exe --quick

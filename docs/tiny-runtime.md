@@ -47,12 +47,28 @@ ctest --test-dir build --output-on-failure
 .\build\bench_tiny_runtime.exe
 ```
 
+## CPU pinning experiment
+
+`bench_tiny_runtime` 支持实验性的 `--pin-cpu N` 参数。它不是默认性能建议，而是用来观察同一个 tiny MLP pipeline 绑定到不同 logical CPU 后的表现。
+
+示例：
+
+```powershell
+.\build\bench_tiny_runtime.exe
+.\build\bench_tiny_runtime.exe --pin-cpu 0
+.\build\bench_tiny_runtime.exe --pin-cpu 2
+.\build\bench_tiny_runtime.exe --pin-cpu 16
+```
+
+在 Intel 混合架构上，不同 logical CPU 可能对应 P 核、E 核或低功耗 E 核。`--pin-cpu` 会限制 Windows 调度器把当前 benchmark 线程放到指定 logical CPU 上，这有助于做实验，但不建议普通应用长期硬绑定。
+
+输出中的 `tiny_runtime_affinity` 段会记录 requested CPU、pin 是否成功、绑定前后的 group / processor。后续可以结合 `bench_cpu_affinity` 的 topology 输出做更谨慎的分析。
+
 ## 后续路线
 
-1. 给 tiny runtime 增加 `--pin-cpu`。
-2. 接入 P/E 核选择策略。
-3. 增加 thread pool。
-4. 增加 SIMD backend。
-5. 增加 OpenBLAS / oneMKL backend。
-6. 增加 softmax 和 layer norm。
-7. 构建 tiny transformer block。
+1. 接入 P/E 核选择策略。
+2. 增加 thread pool。
+3. 增加 SIMD backend。
+4. 增加 OpenBLAS / oneMKL backend。
+5. 增加 softmax 和 layer norm。
+6. 构建 tiny transformer block。

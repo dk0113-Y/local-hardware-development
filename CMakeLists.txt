@@ -33,6 +33,7 @@ endif()
 add_library(aihw_runtime
   src/tensor.cpp
   src/ops.cpp
+  src/cpu_affinity.cpp
 )
 
 target_include_directories(aihw_runtime
