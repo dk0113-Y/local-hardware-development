@@ -1,4 +1,4 @@
-# Tiny AI Runtime MVP
+# Tiny AI Runtime With Tiny Transformer Block
 
 当前阶段定义为 `tiny runtime MVP`。MVP 是 Minimum Viable Product（最小可用产品）的缩写：这里表示 runtime 已经不只是固定 demo，而是可以表达一个小型分类推理 pipeline，并且 benchmark workload 可以通过命令行配置。
 
@@ -10,7 +10,11 @@
 - `add`：相同 shape 的逐元素加法。
 - `softmax`：1D 全向量 softmax，2D 逐行 softmax。
 - `layer_norm`：1D 全向量 layer normalization，2D 逐行 layer normalization。
+- `scaled_dot_product_attention`：single-head scaled dot-product attention。
+- `transformer_block`：pre-norm tiny Transformer Block。
 - `tiny_classifier` pipeline：`input -> matmul -> relu -> matmul -> layer_norm -> softmax -> probabilities`。
+- `tiny_transformer_block` example：固定输入序列和固定权重的最小 Transformer Block 示例。
+- `bench_tiny_transformer`：可配置 tiny Transformer Block benchmark。
 - `bench_tiny_runtime` configurable workload：支持通过 CLI 配置 batch、输入维度、隐藏层维度、输出维度和迭代次数。
 - `bench_tiny_runtime --pin-cpu N`：在 Windows 上尝试把当前 benchmark 线程绑定到指定 logical CPU。
 
@@ -21,11 +25,49 @@
 - backend 选择。
 - OpenBLAS / oneMKL。
 - OpenVINO / ONNX。
-- transformer。
+- multi-head attention。
+- tokenizer / embedding / positional encoding。
+- KV cache。
+- autoregressive generation loop。
 - 模型加载。
 - 训练。
 - 自动求导。
 - 复杂计算图。
+
+## Tiny Transformer Block
+
+Transformer Block 是现代语言模型和很多序列模型里的基础模块。这里实现的是一个最小、可读、可测试的 block，用来把 runtime 从分类 pipeline 推进到 sequence pipeline。它的输入是 `[seq_len, model_dim]`，也就是一段序列中每个位置都有一个 `model_dim` 维向量。
+
+当前实现只做 single-head self-attention。single-head 表示只有一个注意力头；self-attention 表示 Q、K、V 都来自同一个输入序列。Q 是 query（当前位置想找什么），K 是 key（每个位置提供什么匹配特征），V 是 value（真正被加权汇总的内容）。
+
+scaled dot-product attention 的直观含义是：先用 `q * k^T / sqrt(model_dim)` 算出每个位置对其他位置的关注分数，再对每一行做 softmax 得到权重，最后用这些权重加权求和 `v`。除以 `sqrt(model_dim)` 是为了让分数尺度更稳定。
+
+当前默认使用 causal mask。causal 的意思是第 `i` 个位置不能看未来位置 `j > i`，这和自回归语言模型的约束一致。本项目只实现 mask 本身，不实现生成循环。
+
+block 结构采用 pre-norm：
+
+```text
+input sequence
+  -> layer_norm
+  -> single-head causal self-attention
+  -> residual add
+  -> layer_norm
+  -> MLP / feed-forward
+  -> residual add
+  -> output sequence
+```
+
+residual add 是残差连接：把子模块输出加回原输入，帮助后续更深模型保持信息流。MLP / feed-forward 是逐位置前馈网络，这里使用 `matmul -> relu -> matmul`，不实现 bias、GELU 或 dropout。`layer_norm` 在 block 中出现两次，分别在 attention 前和 feed-forward 前。
+
+当前不支持 multi-head attention、embedding、tokenizer、positional encoding、KV cache、autoregressive generation loop、采样或完整语言模型。
+
+运行示例：
+
+```powershell
+.\build\tiny_transformer_block.exe
+.\build\bench_tiny_transformer.exe
+.\build\bench_tiny_transformer.exe --seq-len 64 --model-dim 128 --ff-dim 256 --iterations 3 --pin-cpu 0
+```
 
 ## softmax 是什么
 
@@ -46,7 +88,9 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ctest --test-dir build --output-on-failure
 .\build\tiny_classifier.exe
+.\build\tiny_transformer_block.exe
 .\build\bench_tiny_runtime.exe
+.\build\bench_tiny_transformer.exe
 .\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10
 .\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10 --pin-cpu 0
 .\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10 --pin-cpu 2

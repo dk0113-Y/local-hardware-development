@@ -47,10 +47,20 @@ add_executable(tiny_classifier
 )
 target_link_libraries(tiny_classifier PRIVATE aihw_runtime)
 
+add_executable(tiny_transformer_block
+  examples/tiny_transformer_block.cpp
+)
+target_link_libraries(tiny_transformer_block PRIVATE aihw_runtime)
+
 add_executable(bench_tiny_runtime
   benchmarks/bench_tiny_runtime.cpp
 )
 target_link_libraries(bench_tiny_runtime PRIVATE aihw_runtime)
+
+add_executable(bench_tiny_transformer
+  benchmarks/bench_tiny_transformer.cpp
+)
+target_link_libraries(bench_tiny_transformer PRIVATE aihw_runtime)
 
 enable_testing()
 add_test(NAME tiny_runtime_correctness COMMAND test_tiny_runtime)

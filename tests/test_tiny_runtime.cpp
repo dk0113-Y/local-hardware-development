@@ -238,6 +238,106 @@ int test_tiny_classifier_pipeline_probability_sum() {
   return 0;
 }
 
+aihw::Tensor make_patterned_tensor(std::vector<std::size_t> shape,
+                                   float scale) {
+  aihw::Tensor tensor(shape);
+  for (std::size_t i = 0; i < tensor.size(); ++i) {
+    const int centered = static_cast<int>(i % 17) - 8;
+    tensor[i] = static_cast<float>(centered) * scale;
+  }
+  return tensor;
+}
+
+aihw::TinyTransformerBlockWeights make_transformer_weights(
+    std::size_t model_dim,
+    std::size_t ff_dim) {
+  return {
+      make_patterned_tensor({model_dim, model_dim}, 0.010f),
+      make_patterned_tensor({model_dim, model_dim}, 0.011f),
+      make_patterned_tensor({model_dim, model_dim}, 0.012f),
+      make_patterned_tensor({model_dim, model_dim}, 0.013f),
+      make_patterned_tensor({model_dim, ff_dim}, 0.014f),
+      make_patterned_tensor({ff_dim, model_dim}, 0.015f),
+  };
+}
+
+int test_scaled_dot_product_attention_shape() {
+  const aihw::Tensor q = make_patterned_tensor({3, 4}, 0.01f);
+  const aihw::Tensor k = make_patterned_tensor({3, 4}, 0.02f);
+  const aihw::Tensor v = make_patterned_tensor({3, 4}, 0.03f);
+  const aihw::Tensor out = aihw::scaled_dot_product_attention(q, k, v, true);
+
+  if (out.rows() != 3 || out.cols() != 4) {
+    return fail("scaled_dot_product_attention shape mismatch");
+  }
+  return 0;
+}
+
+int test_scaled_dot_product_attention_causal_behavior() {
+  const aihw::Tensor q({2, 1}, {1.0f, 1.0f});
+  const aihw::Tensor k({2, 1}, {1.0f, 1.0f});
+  const aihw::Tensor v({2, 1}, {1.0f, 3.0f});
+
+  const aihw::Tensor causal = aihw::scaled_dot_product_attention(q, k, v, true);
+  const aihw::Tensor noncausal =
+      aihw::scaled_dot_product_attention(q, k, v, false);
+
+  if (!close_enough(causal.at2d(0, 0), 1.0f, 1e-5f)) {
+    return fail("causal attention row 0 should only see the first value");
+  }
+  if (noncausal.at2d(0, 0) <= 1.0f) {
+    return fail("noncausal attention row 0 should see a future value");
+  }
+  return 0;
+}
+
+int test_transformer_block_output_shape() {
+  const aihw::Tensor x = make_patterned_tensor({4, 8}, 0.02f);
+  const aihw::TinyTransformerBlockWeights weights =
+      make_transformer_weights(8, 16);
+  const aihw::Tensor out = aihw::transformer_block(x, weights, true);
+
+  if (out.rows() != 4 || out.cols() != 8) {
+    return fail("transformer_block output shape mismatch");
+  }
+  return 0;
+}
+
+int test_transformer_block_deterministic_smoke() {
+  const aihw::Tensor x = make_patterned_tensor({3, 4}, 0.02f);
+  const aihw::TinyTransformerBlockWeights weights =
+      make_transformer_weights(4, 8);
+  const aihw::Tensor out1 = aihw::transformer_block(x, weights, true);
+  const aihw::Tensor out2 = aihw::transformer_block(x, weights, true);
+
+  return expect_vector_near("transformer_block deterministic", out1.values(),
+                            out2.values(), 1e-6f);
+}
+
+int test_attention_invalid_shape() {
+  try {
+    const aihw::Tensor q({2, 3});
+    const aihw::Tensor k({2, 3});
+    const aihw::Tensor v({3, 3});
+    (void)aihw::scaled_dot_product_attention(q, k, v, true);
+    return fail("attention shape mismatch did not throw");
+  } catch (const std::invalid_argument&) {
+  }
+  return 0;
+}
+
+int test_transformer_block_invalid_weight_shape() {
+  try {
+    const aihw::Tensor x = make_patterned_tensor({4, 8}, 0.02f);
+    aihw::TinyTransformerBlockWeights weights = make_transformer_weights(8, 16);
+    weights.w_ff2 = aihw::Tensor({15, 8});
+    (void)aihw::transformer_block(x, weights, true);
+    return fail("transformer weight shape mismatch did not throw");
+  } catch (const std::invalid_argument&) {
+  }
+  return 0;
+}
+
 }  // namespace
 
 int main() {
@@ -245,7 +345,13 @@ int main() {
       test_relu() || test_add() || test_softmax_1d_known_values() ||
       test_softmax_2d_row_sums() || test_layer_norm_1d_properties() ||
       test_layer_norm_2d_properties() || test_tiny_classifier_pipeline_shape() ||
-      test_tiny_classifier_pipeline_probability_sum()) {
+      test_tiny_classifier_pipeline_probability_sum() ||
+      test_scaled_dot_product_attention_shape() ||
+      test_scaled_dot_product_attention_causal_behavior() ||
+      test_transformer_block_output_shape() ||
+      test_transformer_block_deterministic_smoke() ||
+      test_attention_invalid_shape() ||
+      test_transformer_block_invalid_weight_shape()) {
     return 1;
   }
 
