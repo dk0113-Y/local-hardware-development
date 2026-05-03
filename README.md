@@ -24,17 +24,22 @@ Use `NEW_CHAT_PROMPT.md` to start a new Codex chat with the intended context.
 
 ## Current Direction
 
-The current main line is a tiny AI runtime skeleton. Earlier standalone CPU,
+The current main line is a tiny AI runtime MVP. Earlier standalone CPU,
 memory, and core-observation experiments have been cleaned up so the repository
 can focus on the runtime path. Their main lessons now feed into the runtime
 implementation and the `--pin-cpu` benchmark option.
+
+The MVP runtime includes `Tensor`, `matmul`, `relu`, `add`, `softmax`,
+`layer_norm`, a tiny classifier example, and configurable benchmark workloads.
 
 ```powershell
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ctest --test-dir build --output-on-failure
 .\build\tiny_mlp.exe
+.\build\tiny_classifier.exe
 .\build\bench_tiny_runtime.exe
+.\build\bench_tiny_runtime.exe --batch 2 --input-dim 16 --hidden-dim 32 --output-dim 8 --iterations 3
 .\build\bench_tiny_runtime.exe --pin-cpu 0
 ```
 

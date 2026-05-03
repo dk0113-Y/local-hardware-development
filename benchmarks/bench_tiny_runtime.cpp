@@ -4,9 +4,11 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cerrno>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -18,16 +20,62 @@ struct Options {
   bool show_help = false;
   bool pin_cpu = false;
   unsigned requested_cpu = 0;
+  std::size_t batch = 1;
+  std::size_t input_dim = 256;
+  std::size_t hidden_dim = 512;
+  std::size_t output_dim = 128;
+  int iterations = 20;
 };
 
-bool parse_uint(const char* text, unsigned* value) {
+bool parse_positive_size(const char* text, std::size_t* value) {
+  if (text == nullptr || text[0] == '-' || text[0] == '\0') {
+    return false;
+  }
   char* end = nullptr;
-  const unsigned long parsed = std::strtoul(text, &end, 10);
-  if (end == text || *end != '\0') {
+  errno = 0;
+  const unsigned long long parsed = std::strtoull(text, &end, 10);
+  if (end == text || *end != '\0' || errno == ERANGE || parsed == 0 ||
+      parsed > static_cast<unsigned long long>(
+                   std::numeric_limits<std::size_t>::max())) {
+    return false;
+  }
+  *value = static_cast<std::size_t>(parsed);
+  return true;
+}
+
+bool parse_uint(const char* text, unsigned* value) {
+  if (text == nullptr || text[0] == '-' || text[0] == '\0') {
+    return false;
+  }
+  char* end = nullptr;
+  errno = 0;
+  const unsigned long long parsed = std::strtoull(text, &end, 10);
+  if (end == text || *end != '\0' || errno == ERANGE ||
+      parsed > static_cast<std::size_t>(std::numeric_limits<unsigned>::max())) {
     return false;
   }
   *value = static_cast<unsigned>(parsed);
   return true;
+}
+
+void fail_argument(const std::string& message) {
+  std::cerr << message << "\n";
+  std::exit(2);
+}
+
+std::size_t parse_required_size(int argc,
+                                char** argv,
+                                int* index,
+                                const std::string& name) {
+  if (*index + 1 >= argc) {
+    fail_argument("missing value for " + name);
+  }
+  std::size_t value = 0;
+  if (!parse_positive_size(argv[*index + 1], &value)) {
+    fail_argument("invalid " + name + " argument");
+  }
+  ++(*index);
+  return value;
 }
 
 Options parse_options(int argc, char** argv) {
@@ -36,17 +84,30 @@ Options parse_options(int argc, char** argv) {
     const std::string arg = argv[i];
     if (arg == "--help") {
       options.show_help = true;
+    } else if (arg == "--batch") {
+      options.batch = parse_required_size(argc, argv, &i, arg);
+    } else if (arg == "--input-dim") {
+      options.input_dim = parse_required_size(argc, argv, &i, arg);
+    } else if (arg == "--hidden-dim") {
+      options.hidden_dim = parse_required_size(argc, argv, &i, arg);
+    } else if (arg == "--output-dim") {
+      options.output_dim = parse_required_size(argc, argv, &i, arg);
+    } else if (arg == "--iterations") {
+      const std::size_t value = parse_required_size(argc, argv, &i, arg);
+      if (value >
+          static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+        fail_argument("invalid --iterations argument");
+      }
+      options.iterations = static_cast<int>(value);
     } else if (arg == "--pin-cpu") {
       if (i + 1 >= argc ||
           !parse_uint(argv[i + 1], &options.requested_cpu)) {
-        std::cerr << "invalid --pin-cpu argument\n";
-        std::exit(2);
+        fail_argument("invalid --pin-cpu argument");
       }
       options.pin_cpu = true;
       ++i;
     } else {
-      std::cerr << "unknown argument: " << arg << "\n";
-      std::exit(2);
+      fail_argument("unknown argument: " + arg);
     }
   }
   return options;
@@ -54,11 +115,16 @@ Options parse_options(int argc, char** argv) {
 
 void print_usage() {
   std::cout << "Usage:\n"
-            << "  bench_tiny_runtime [--pin-cpu N] [--help]\n\n"
+            << "  bench_tiny_runtime [options]\n\n"
             << "Options:\n"
-            << "  --pin-cpu N  Pin current benchmark thread to logical CPU N "
+            << "  --batch N        Batch size.\n"
+            << "  --input-dim N    Input dimension.\n"
+            << "  --hidden-dim N   Hidden dimension.\n"
+            << "  --output-dim N   Output dimension.\n"
+            << "  --iterations N   Number of benchmark iterations.\n"
+            << "  --pin-cpu N      Pin current benchmark thread to logical CPU N "
                "on Windows.\n"
-            << "  --help       Show this help.\n";
+            << "  --help           Show this help.\n";
 }
 
 std::string csv_error(std::string value) {
@@ -97,12 +163,6 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  constexpr std::size_t batch = 1;
-  constexpr std::size_t input_dim = 256;
-  constexpr std::size_t hidden_dim = 512;
-  constexpr std::size_t output_dim = 128;
-  constexpr int iterations = 20;
-
   aihw::PinCpuResult affinity;
   if (options.pin_cpu) {
     affinity = aihw::pin_current_thread_to_cpu(options.requested_cpu);
@@ -111,19 +171,23 @@ int main(int argc, char** argv) {
     affinity.after = aihw::current_processor_location();
   }
 
-  const aihw::Tensor input = make_patterned_tensor({batch, input_dim}, 0.01f);
-  const aihw::Tensor w1 = make_patterned_tensor({input_dim, hidden_dim}, 0.002f);
-  const aihw::Tensor w2 = make_patterned_tensor({hidden_dim, output_dim}, 0.003f);
+  const aihw::Tensor input =
+      make_patterned_tensor({options.batch, options.input_dim}, 0.01f);
+  const aihw::Tensor w1 =
+      make_patterned_tensor({options.input_dim, options.hidden_dim}, 0.002f);
+  const aihw::Tensor w2 =
+      make_patterned_tensor({options.hidden_dim, options.output_dim}, 0.003f);
 
   double best_ms = 1e100;
   float best_sink = 0.0f;
-  for (int iter = 0; iter < iterations; ++iter) {
+  for (int iter = 0; iter < options.iterations; ++iter) {
     const auto start = std::chrono::steady_clock::now();
     const aihw::Tensor hidden = aihw::relu(aihw::matmul(input, w1));
-    const aihw::Tensor output = aihw::matmul(hidden, w2);
+    const aihw::Tensor logits = aihw::matmul(hidden, w2);
+    const aihw::Tensor probabilities = aihw::softmax(aihw::layer_norm(logits));
     const auto stop = std::chrono::steady_clock::now();
 
-    const float current_sink = checksum(output);
+    const float current_sink = checksum(probabilities);
     g_sink = current_sink;
     const double ms =
         std::chrono::duration<double, std::milli>(stop - start).count();
@@ -146,8 +210,9 @@ int main(int argc, char** argv) {
   std::cout << "section,tiny_runtime_benchmark\n";
   std::cout << "benchmark,batch,input_dim,hidden_dim,output_dim,iterations,"
                "best_ms,sink\n";
-  std::cout << "tiny_mlp_runtime," << batch << "," << input_dim << ","
-            << hidden_dim << "," << output_dim << "," << iterations << ","
+  std::cout << "tiny_classifier_runtime," << options.batch << ","
+            << options.input_dim << "," << options.hidden_dim << ","
+            << options.output_dim << "," << options.iterations << ","
             << std::fixed << std::setprecision(3) << best_ms << ","
             << best_sink << "\n";
 

@@ -1,4 +1,56 @@
-# Tiny AI Runtime Skeleton
+# Tiny AI Runtime MVP
+
+当前阶段定义为 `tiny runtime MVP`。MVP 是 Minimum Viable Product（最小可用产品）的缩写：这里表示 runtime 已经不只是固定 demo，而是可以表达一个小型分类推理 pipeline，并且 benchmark workload 可以通过命令行配置。
+
+## 当前支持
+
+- 1D / 2D row-major `Tensor`。
+- `matmul`：2D 矩阵乘法。
+- `relu`：逐元素 ReLU 激活函数。
+- `add`：相同 shape 的逐元素加法。
+- `softmax`：1D 全向量 softmax，2D 逐行 softmax。
+- `layer_norm`：1D 全向量 layer normalization，2D 逐行 layer normalization。
+- `tiny_classifier` pipeline：`input -> matmul -> relu -> matmul -> layer_norm -> softmax -> probabilities`。
+- `bench_tiny_runtime` configurable workload：支持通过 CLI 配置 batch、输入维度、隐藏层维度、输出维度和迭代次数。
+- `bench_tiny_runtime --pin-cpu N`：在 Windows 上尝试把当前 benchmark 线程绑定到指定 logical CPU。
+
+## 当前不支持
+
+- 多线程。
+- SIMD。
+- backend 选择。
+- OpenBLAS / oneMKL。
+- OpenVINO / ONNX。
+- transformer。
+- 模型加载。
+- 训练。
+- 自动求导。
+- 复杂计算图。
+
+## softmax 是什么
+
+`softmax` 常用于分类模型的最后一步。它把一行 logits（模型原始分数）转换成概率分布：每个输出值大于 0，并且同一行的概率和接近 1。本项目使用数值稳定写法：先减去每行最大值，再计算 `exp` 和归一化，避免指数计算过大。
+
+## layer_norm 是什么
+
+`layer_norm` 是 layer normalization（层归一化）。它对同一行数据计算均值和方差，然后执行 `(x - mean) / sqrt(variance + epsilon)`，让输出均值接近 0、方差接近 1。当前第一版不支持 gamma / beta 参数，只做标准化。
+
+## configurable workload 的意义
+
+可配置 workload 让同一个 benchmark 可以测试不同问题规模。例如小 batch 适合快速正确性检查，大维度适合观察 CPU 计算耗时和 `--pin-cpu` 对结果的影响。这比固定 demo 更接近后续做 backend 对照和硬件实验的需求。
+
+## 构建和运行
+
+```powershell
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+.\build\tiny_classifier.exe
+.\build\bench_tiny_runtime.exe
+.\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10
+.\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10 --pin-cpu 0
+.\build\bench_tiny_runtime.exe --batch 16 --input-dim 1024 --hidden-dim 2048 --output-dim 512 --iterations 10 --pin-cpu 2
+```
 
 这个文档说明 `local-hardware-development` 的新主线：一个本机硬件感知的 tiny AI runtime。
 

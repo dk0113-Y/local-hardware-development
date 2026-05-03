@@ -42,6 +42,11 @@ add_executable(tiny_mlp
 )
 target_link_libraries(tiny_mlp PRIVATE aihw_runtime)
 
+add_executable(tiny_classifier
+  examples/tiny_classifier.cpp
+)
+target_link_libraries(tiny_classifier PRIVATE aihw_runtime)
+
 add_executable(bench_tiny_runtime
   benchmarks/bench_tiny_runtime.cpp
 )
