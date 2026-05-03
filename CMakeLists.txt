@@ -44,5 +44,9 @@ add_executable(bench_memory_access
   benchmarks/bench_memory_access.cpp
 )
 
+add_executable(bench_cpu_affinity
+  benchmarks/bench_cpu_affinity.cpp
+)
+
 enable_testing()
 add_test(NAME matmul_correctness COMMAND test_matmul)

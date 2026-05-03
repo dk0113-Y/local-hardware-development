@@ -34,7 +34,10 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 .\build\bench_matmul.exe
 .\build\bench_memory_access.exe
+.\build\bench_cpu_affinity.exe --quick
+.\build\bench_cpu_affinity.exe --cpu 0
 ```
 
 See `docs/phase1.md` for the experiment rationale and next steps.
 See `docs/cpu-memory-access.md` for the CPU cache and memory access benchmark.
+See `docs/cpu-affinity.md` for the CPU affinity and logical processor benchmark.
