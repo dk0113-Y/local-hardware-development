@@ -72,7 +72,7 @@ int test_at2d() {
   return 0;
 }
 
-int test_matmul() {
+int test_runtime_matmul() {
   const aihw::Tensor a({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
   const aihw::Tensor b({3, 2}, {7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f});
   const aihw::Tensor c = aihw::matmul(a, b);
@@ -117,7 +117,7 @@ int test_tiny_pipeline_shape() {
 }  // namespace
 
 int main() {
-  if (test_tensor_shape_and_size() || test_at2d() || test_matmul() ||
+  if (test_tensor_shape_and_size() || test_at2d() || test_runtime_matmul() ||
       test_relu() || test_add() || test_tiny_pipeline_shape()) {
     return 1;
   }

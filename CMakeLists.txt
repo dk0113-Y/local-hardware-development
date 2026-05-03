@@ -12,21 +12,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(AIHW_ENABLE_NATIVE "Enable local CPU tuning flags such as -march=native" OFF)
 
-add_library(aihw_cpu
-  src/matmul.cpp
-)
-
-target_include_directories(aihw_cpu
-  PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
 if(MSVC)
-  target_compile_options(aihw_cpu PRIVATE /W4)
+  add_compile_options(/W4)
 else()
-  target_compile_options(aihw_cpu PRIVATE -Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic)
   if(AIHW_ENABLE_NATIVE)
-    target_compile_options(aihw_cpu PRIVATE -march=native)
+    add_compile_options(-march=native)
   endif()
 endif()
 
@@ -41,13 +32,6 @@ target_include_directories(aihw_runtime
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(aihw_runtime PUBLIC aihw_cpu)
-
-add_executable(test_matmul
-  tests/test_matmul.cpp
-)
-target_link_libraries(test_matmul PRIVATE aihw_cpu)
-
 add_executable(test_tiny_runtime
   tests/test_tiny_runtime.cpp
 )
@@ -58,24 +42,10 @@ add_executable(tiny_mlp
 )
 target_link_libraries(tiny_mlp PRIVATE aihw_runtime)
 
-add_executable(bench_matmul
-  benchmarks/bench_matmul.cpp
-)
-target_link_libraries(bench_matmul PRIVATE aihw_cpu)
-
 add_executable(bench_tiny_runtime
   benchmarks/bench_tiny_runtime.cpp
 )
 target_link_libraries(bench_tiny_runtime PRIVATE aihw_runtime)
 
-add_executable(bench_memory_access
-  benchmarks/bench_memory_access.cpp
-)
-
-add_executable(bench_cpu_affinity
-  benchmarks/bench_cpu_affinity.cpp
-)
-
 enable_testing()
-add_test(NAME matmul_correctness COMMAND test_matmul)
 add_test(NAME tiny_runtime_correctness COMMAND test_tiny_runtime)

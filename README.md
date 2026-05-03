@@ -22,11 +22,12 @@ Recommended development tracks:
 
 Use `NEW_CHAT_PROMPT.md` to start a new Codex chat with the intended context.
 
-## Current direction
+## Current Direction
 
-The current main line is a tiny AI runtime skeleton. The earlier matmul,
-memory access, and CPU affinity experiments remain as foundation experiments
-and support tools.
+The current main line is a tiny AI runtime skeleton. Earlier standalone CPU,
+memory, and core-observation experiments have been cleaned up so the repository
+can focus on the runtime path. Their main lessons now feed into the runtime
+implementation and the `--pin-cpu` benchmark option.
 
 ```powershell
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -35,14 +36,6 @@ ctest --test-dir build --output-on-failure
 .\build\tiny_mlp.exe
 .\build\bench_tiny_runtime.exe
 .\build\bench_tiny_runtime.exe --pin-cpu 0
-.\build\bench_matmul.exe
-.\build\bench_memory_access.exe
-.\build\bench_cpu_affinity.exe --quick
-.\build\bench_cpu_affinity.exe --cpu 0
 ```
 
-See `docs/phase1.md` for the experiment rationale and next steps.
-See `docs/cpu-memory-access.md` for the CPU cache and memory access benchmark.
-See `docs/cpu-affinity.md` for the CPU affinity and logical processor benchmark.
 See `docs/tiny-runtime.md` for the tiny AI runtime direction.
-See `docs/runtime-cleanup-plan.md` for a cautious cleanup plan.
