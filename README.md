@@ -37,7 +37,7 @@ preparation includes:
 - measuring runtime behavior with repeatable commands;
 - documenting what is implemented and what is still out of scope.
 
-This repository is a learning and portfolio artifact for those foundations.
+This repository is a learning artifact for those foundations.
 
 ## What This Repository Is
 
@@ -412,9 +412,9 @@ Not implemented yet:
 - production-level profiling infrastructure;
 - CI matrix.
 
-## Internship Skill Mapping
+## Engineering Coverage
 
-| Internship skill area | Evidence in this repository |
+| Area | Evidence in this repository |
 | --- | --- |
 | C++ engineering organization | Public headers, source files, tests, examples, and benchmarks are separated. |
 | CMake and Ninja workflow | `CMakeLists.txt` defines the library, executables, warnings, and CTest entry. |
@@ -425,12 +425,8 @@ Not implemented yet:
 | Hardware-aware development | Row-major matmul and CPU pinning reports support local hardware experiments. |
 | Engineering documentation | README, design notes, agent rules, and issue templates document the workflow. |
 
-These are foundational capabilities for internships in embedded software,
-edge AI, robotics runtime components, autonomous-driving simulation tooling,
-and AI toolchains.
-
-They should be presented as learning-backed engineering evidence, not as proof
-of completed embedded deployment.
+These entries describe the current code and documentation surface. They are
+not evidence of completed embedded deployment.
 
 ## Development Environment
 
